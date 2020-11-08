@@ -1,0 +1,289 @@
+---
+title: "Final Project"
+author: "Jaiveer Katariya"
+date: "11/4/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+## Introduction
+
+
+## Background
+
+
+
+## Procedure
+
+
+## Results
+
+### Exploratory Data Analysis
+To begin, we'll load the data in from the aforementioned formatted csv and perform some exploratory data analysis. 
+
+```{r}
+data <- read.csv('formatted_responses.csv')
+numberRespondents <- unique(data$Respondent) %>%
+  length
+num_uni <- unique(data$College) %>%
+  length()
+
+numberRespondents
+num_uni
+  
+```
+
+Through the data collection methods above, responses were collected from 204 students attending 48 different universities. These were both public and private universities scattered throughout the country from the University of Florida to Stanford University. 
+
+This variety of colleges likely had an impact on the next statistic observed - the respondents' political stances. 
+
+```{r}
+ideology <- data %>%
+  group_by(Ideology) %>%
+  summarise(count=n()*100/3654) 
+
+ideology
+
+ideology %>%
+  ggplot(aes(x="", y=count, fill=Ideology)) + 
+  geom_bar(stat="identity", width=1) +
+  coord_polar("y", start=0) + theme_void()
+
+```
+
+
+As expected, the vast majority of college students identified themselves as being left of center. Given the well known phenomenon that college students will generally be left of center, going into the experiment, one concern was that there wasn't going to be enough representation of right-wing political viewpoints. Though the validity of the data has yet to be seen in additional tests, nearly a quarter of respondents identified as either centrists or right of center, which was a greater portion than initially expected. 
+
+As for the tweets themselves, it may be of use to get a sense of what people's responses were to them on average. 
+
+```{r}
+data %>%
+  group_by(Tweet) %>%
+  summarise(
+    average_like = mean(Engagement_Like)
+  ) %>%
+  ggplot(aes(x=average_like)) + geom_histogram(bindwidth=0.01) + theme_minimal()
+
+data %>%
+  group_by(Tweet) %>%
+  summarise(
+    average_retweet_without = mean(Engagement_Retweet.without.quote)
+  ) %>%
+  ggplot(aes(x=average_retweet_without)) + geom_histogram(bindwidth=0.01) + theme_minimal()
+
+data %>%
+  group_by(Tweet) %>%
+  summarise(
+    average_retweet_with = mean(Engagement_Retweet.with.quote)
+  ) %>%
+  ggplot(aes(x=average_retweet_with)) + geom_histogram(bindwidth=0.01) + theme_minimal()
+
+data %>%
+  group_by(Tweet) %>%
+  summarise(
+     average_view_replies = mean(Engagement_View.replies)
+  ) %>%
+  ggplot(aes(x=average_view_replies)) + geom_histogram(bindwidth=0.01) + theme_minimal()
+
+data %>%
+  group_by(Tweet) %>%
+  summarise(
+    average_profile_click = mean(Engagement_Click.on.author.s.profile)
+  ) %>%
+  ggplot(aes(x=average_profile_click)) + geom_histogram(bindwidth=0.01) + theme_minimal()
+
+data %>%
+  group_by(Tweet) %>%
+  summarise(
+    average_write_reply = mean(Engagement_Write.reply)
+  ) %>%
+  ggplot(aes(x=average_write_reply)) + geom_histogram(bindwidth=0.01) + theme_minimal()
+
+data %>%
+  group_by(Tweet) %>%
+  summarise(
+    average_ignore = mean(Engagement_Ignore.keep.scrolling)
+  ) %>%
+  ggplot(aes(x=average_ignore)) + geom_histogram(bindwidth=0.01) + theme_minimal()
+
+
+```
+
+In the above graphs, each engagement type (which was assigned a 1 if users selected that method of engagement and 0 if not) was averaged for each tweet, giving the portion of users that performed that engagement for each tweet. The above histograms are therefore meant to describe how often users were performing each type of engagement across the entire corpus of tweets.
+
+First, understandably, a significant number of tweets received either little to no likes or a "likes" average of around 0.5. Therefore, it seems as though many tweets were either widely liked (closer to being liked by about half the respondents), or widely not liked (receiving likes from almost 0% of respondents). Given the political nature of these tweets, these disparate scores may be a result of the heavy left-leaning bias that exists in the respondents. If most of the respondents were left leaning, then it makes sense that most of the respondents would act similarly, either uniformly liking or not liking a tweet. While it may be pointed out that a "like" rate of 0.5 does not indicate a "uniform liking" of the tweet by the respondents, the distinct separation between the two peaks in the histogram is certainly worth noting.
+
+The next engagement pattern, retweets without quotes, shows a slightly different story. While a few tweets were, on average, retweeted occasionally (between 10 and 20% of the time), the vast majority of tweets were retweeted rarely, if ever. While not as indicative of any sort of political bias among the respondents, this pattern is somewhat of a different expected trend: people's reluctance to publicly engage with political content in general, and therefore the controversial subject matter intentionally selected for this study. Retweets, more than any kind of engagement, clearly associate the user with the content being retweeted to the public eye. This is a consequence that many college students, whether or not they're seeking professional and academic opportunities, may not want to inflict upon themselves, and as a result, they may be hesitant to retweet this controversial, polarizing content. We can observe a similar pattern for retweets with quotes, which respondents were even less likely to perform; likely for the same aforementioned reasons.
+
+Yet another distinct pattern can be observed for viewing replies, which makes sense. Unlike the first three forms of engagement, viewing replies is not a form of engagement that is directly visible to one's following. As a result, it may be a form of engagement that users are more likely to do across all tweets. This was, to some extent, reflected in the above histogram. Just about every tweet had its replies viewed between 20 and 40 percent of the time, with a single outlier on each side of that interval. 
+
+Next, though viewing author profiles are also a private form of engagement, users seemed to be far less likely to do that than to view replies, with most tweets having their replies viewed between 5 and 10 percent of the time.
+
+By far the least common form of engagement taken was writing replies to the tweet, likely for the same reasons that caused the low frequencies of retweets. The two tweets in which this response was the most common had less than five percent of respondents indicate that they would do so.
+
+In a move completely contradictory to many of the assumptions introduced in the background of this study, ignoring tweets seemed to be, by far, the most common response to the tweets in this study, with the least-ignored tweets being ignored 30-40% of the time, and the most frequently ignored tweets being ignored over 70% of the time. This outcome may be due to a number of factors, including the time at which this survey was conducted: the weeks leading up to the 2020 Presidential Election. Most respondents had probably been overexposed to political content leading up to the survey, and as a result, were probably desensitized to much of the content on the survey. This may have resulted in a higher rate of apathy towards the political content than if the survey were conducted at a different, less politicized time of year. One may compare this phenomenon to the playing of Christmas carols in public spaces throughout the United States during the holiday season. The first listening of Mariah Carey's "All I Want for Christmas is You" may fill many with a warm, pleasant feeling inside, but by late December, most are numb to the amorous holiday-themed lyrics and upbeat melody.
+
+
+
+Before investigating correlations involving emotional reactions to the tweets, an analysis similar to the one conducted for engagement may be of some worth. The histograms below show the portion of users that had each emotional response for each tweet.
+
+```{r}
+data %>%
+  group_by(Tweet) %>%
+  summarise(
+    average_joy = mean(Reaction_Joy)
+  ) %>%
+  ggplot(aes(x=average_joy)) + geom_histogram(bindwidth=0.01) + theme_minimal()
+
+data %>%
+  group_by(Tweet) %>%
+  summarise(
+    average_sadness = mean(Reaction_Sadness)
+  ) %>%
+  ggplot(aes(x=average_sadness)) + geom_histogram(bindwidth=0.01) + theme_minimal()
+
+data %>%
+  group_by(Tweet) %>%
+  summarise(
+    average_relief = mean(Reaction_Relief)
+  ) %>%
+  ggplot(aes(x=average_relief)) + geom_histogram(bindwidth=0.01) + theme_minimal()
+
+data %>%
+  group_by(Tweet) %>%
+  summarise(
+     average_distress = mean(Reaction_Distress)
+  ) %>%
+  ggplot(aes(x=average_distress)) + geom_histogram(bindwidth=0.01) + theme_minimal()
+
+data %>%
+  group_by(Tweet) %>%
+  summarise(
+    average_hope = mean(Reaction_Hope)
+  ) %>%
+  ggplot(aes(x=average_hope)) + geom_histogram(bindwidth=0.01) + theme_minimal()
+
+data %>%
+  group_by(Tweet) %>%
+  summarise(
+    average_fear = mean(Reaction_Fear)
+  ) %>%
+  ggplot(aes(x=average_fear)) + geom_histogram(bindwidth=0.01) + theme_minimal()
+
+
+data %>%
+  group_by(Tweet) %>%
+  summarise(
+    average_empathy = mean(Reaction_Empathy)
+  ) %>%
+  ggplot(aes(x=average_empathy)) + geom_histogram(bindwidth=0.01) + theme_minimal()
+
+data %>%
+  group_by(Tweet) %>%
+  summarise(
+    average_frustration = mean(Reaction_Frustration)
+  ) %>%
+  ggplot(aes(x=average_frustration)) + geom_histogram(bindwidth=0.01) + theme_minimal()
+
+data %>%
+  group_by(Tweet) %>%
+  summarise(
+    average_frustration = mean(Reaction_Frustration)
+  ) %>% 
+  arrange(desc(average_frustration))
+
+data %>%
+  group_by(Tweet) %>%
+  summarise(
+    average_agreement = mean(Reaction_Agreement)
+  ) %>%
+  ggplot(aes(x=average_agreement)) + geom_histogram(bindwidth=0.01) + theme_minimal()
+
+data %>%
+  group_by(Tweet) %>%
+  summarise(
+    average_dissension = mean(Reaction_Dissension)
+  ) %>%
+  ggplot(aes(x=average_dissension)) + geom_histogram(bindwidth=0.01) + theme_minimal()
+
+data %>%
+  group_by(Tweet) %>%
+  summarise(
+    average_apathy = mean(Reaction_NONE)
+  ) %>%
+  ggplot(aes(x=average_apathy)) + geom_histogram(bindwidth=0.01) + theme_minimal()
+```
+
+To begin, little to no joy was felt by respondents for just about every tweet in the corpus, with most being near an average of 0% of respondents reporting joy. The single outlier in the data seems to be a tweet for which only 8% of respondents felt joy. This graph can be said to demonstrate, to at least some capacity, how little joy political Twitter brings to college students. While these data can be interpreted to convey that college students simply don't enjoy politics, perhaps the more likely reason for this outcome is the current emotional climate of political content on Twitter.
+
+The negative counterpart to joy in this study was sadness, which seemed to be a much more popular response across the entire corpus. Though still reported in less than half of respondents for every tweet, the portions of responses that report sadness are generally significantly higher. 
+
+The same trend seems to be even more exaggerated in the next pair of emotions, relief and distress. In a response that aligned perfectly with the earlier description of today's political climate, distress seemed to be a much more common response to the displayed tweets than relief. While most tweets incited distress in 10 to 30 percent of respondents, most tweets fostered relief in less than 1% of the respondents who saw them. These trends are indicative of the very issue that motivated this paper: political content on Twitter is outrage-inducing. Whether or not this phenomenon is intentional, it is an issue that absolutely needs to be better understood for the sake of the entire US population.
+
+While the scales are not dramatically different in the graphs showing the portions of respondents who reacted to each tweet with fear and hope, the graph for the former seems to be more normally distributed than the right-skewed graph for the latter. While fear was not exactly common, with most tweets triggering fear in less than 15% of the respondents, there were several that did so in more than 20% of the respondents. Meanwhile, only two tweets inspired hope in 10% or more of the respondents, indicating that, at least for the tweets that were intentionally selected to be controversial, fear tended to be a much more common reaction than hope. 
+
+A great demonstrator of the polarizing nature of political tweets is the disparity in responses among the next pair of emotional responses, frustration and empathy. Continuing the trend, there were many more tweets that elicited the negative emotion in a high portion of respondents than tweets that elicited the positive emotion. While most tweets inspired empathy in less than 10% of the respondents, almost every tweet provoked frustration in more than 30% of the respondents, with several provoking frustration in more than 60% of the respondents. These widely-frustrating tweets were tweets 14, 6, and 10, which, in order, called the coronavirus a hoax, showed protesters clashing with law enforcement officers to the glee of the tweet author, and defended a white supremacist group. If political tweets are, on average, generating more frustration than empathy in their audiences, then it only makes sense that those audiences will become increasingly polarized and divided.
+
+The last pair of emotions provided to respondents were dissension and agreement. The two had similar distributions: tweets either incited these emotions in more than 30% of the respondents, or in less than 10%. One feature worth nothing though is that there were several tweets that garnered agreement from more than 50% of the users, while there was only one such tweet for dissension. This may be indicative of a political bias in the respondents or in the survey On one hand, the respondents may have disproportionately agreed upon certain political messages. On the other, the survey may have contained a disproportionately large number of tweets that were widely agreeable across all political groups. Determining which kind of bias exists, and the extent to which it exists, would likely require more testing with a larger set of tweets and a larger sample population.
+
+In addition to the aforementioned emotional responses, respondents also had the option to mark "NONE", indicating that they had no significant emotional response. Half of the tweets had between 20 and 40% of the respondents mark this as their response, while the rest of the tweets were just outside this range. This was especially interesting given one of the assumptions reached in the background of this paper, which stated that it would make sense for political content generators to produce intentionally emotionally-charged content since emotionally-charged content will generally spread more and draw more participation than purely reason-based content. However, it is possible that the content was emotionally charged, and, as was said before, respondents had simply been overexposed to political content prior to taking the survey. As a result, respondents may have been much more likely to feel apathetic to the content in the survey than if they hadn't taken the survey in the weeks leading up to a presidential election, therefore causing the high rates of apathy for the tweets in the survey.
+
+### Relationships Between Political Stance, Emotional Reaction, and Engagement
+Now that some sense has been made of the data, to fully answer the question of how individuals' emotional responses shaped their engagement patterns, it is important to understand the role of individuals' political stances in both their engagement and emotional reactions.
+
+The following graphs show, for each tweet, how engagement varied across two political groups: respondents who identified as moderately liberal, liberal, or extremely liberal, and respondents who identified as centrist, moderately conservative, conservative, or extremely conservative.
+
+```{r}
+data <- data %>%
+  mutate(political_group = case_when(
+    Ideology == "Moderately Liberal" | Ideology == "Liberal" | Ideology == "Extremely Liberal" ~ "Left",
+    TRUE ~ "Not Left"
+  ))
+
+gen_engagement_graph <- function(tweetNumber){
+  toReturn <- data %>%
+    filter(Tweet==tweetNumber) %>%
+    dplyr::select(Engagement_Like, Engagement_Retweet.with.quote, Engagement_Retweet.without.quote, Engagement_Click.on.author.s.profile, Engagement_View.replies, Engagement_Write.reply, Engagement_Ignore.keep.scrolling, political_group) %>%
+    group_by(political_group) %>%
+    summarise(
+      like_proportion = mean(Engagement_Like),
+      rt_without_proportion = mean(Engagement_Retweet.without.quote),
+      rt_with_proportion = mean(Engagement_Retweet.with.quote),
+      click_profile_proportion = mean(Engagement_Click.on.author.s.profile),
+      view_replies_proportion = mean(Engagement_View.replies),
+      write_replies_proportion = mean(Engagement_Write.reply),
+      ignore_proportion = mean(Engagement_Ignore.keep.scrolling)
+    ) %>%
+    gather(key = Engagement, value = Proportion, like_proportion:ignore_proportion) %>%
+    ggplot(aes(Engagement, Proportion, fill = political_group)) + geom_col(position = "dodge") + coord_flip()
+
+  return(toReturn)
+}
+
+gen_engagement_graph(1)
+  
+  
+```
+
+
+THEN DO SAME SHIT FOR SECOND, THEN LAST BIT
+
+
+
+
+THINGS THAT I WANT TO TEST:
+- Compare political ideology to engagement for each tweet
+- Compare political ideology to emotional response for each tweet
+- Emotional response vs engagement, compare between political parties
+
+
+## Analysis of Results
+
+
+## Conclusion
+
+
+
