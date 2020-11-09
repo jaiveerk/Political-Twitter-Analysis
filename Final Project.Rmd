@@ -17,7 +17,10 @@ library(tidyverse)
 
 
 ## Procedure
-
+ Explain ordering of questions
+ Explain tweet selection process
+ Explain coming up with engagement options, why they matter
+ Explain emotional scale
 
 ## Results
 
@@ -232,14 +235,16 @@ The last pair of emotions provided to respondents were dissension and agreement.
 In addition to the aforementioned emotional responses, respondents also had the option to mark "NONE", indicating that they had no significant emotional response. Half of the tweets had between 20 and 40% of the respondents mark this as their response, while the rest of the tweets were just outside this range. This was especially interesting given one of the assumptions reached in the background of this paper, which stated that it would make sense for political content generators to produce intentionally emotionally-charged content since emotionally-charged content will generally spread more and draw more participation than purely reason-based content. However, it is possible that the content was emotionally charged, and, as was said before, respondents had simply been overexposed to political content prior to taking the survey. As a result, respondents may have been much more likely to feel apathetic to the content in the survey than if they hadn't taken the survey in the weeks leading up to a presidential election, therefore causing the high rates of apathy for the tweets in the survey.
 
 ### Relationships Between Political Stance, Emotional Reaction, and Engagement
-Now that some sense has been made of the data, to fully answer the question of how individuals' emotional responses shaped their engagement patterns, it is important to understand the role of individuals' political stances in both their engagement and emotional reactions.
+Before diving directly into the relationship between individuals' emotional response to political content and their engagement with it, it may be valuable to first understand how their political beliefs affect their engagement. After all, it only makes sense that one's emotional disposition regarding political tweets would be heavily influenced by their political beliefs. Therefore, any relationship between people's ideological stances and their engagement may provide context necessary to this study's attempt at answering the focal question.
 
-The following graphs show, for each tweet, how engagement varied across two political groups: respondents who identified as moderately liberal, liberal, or extremely liberal, and respondents who identified as centrist, moderately conservative, conservative, or extremely conservative.
+The following graphs show, for each tweet, how engagement varied across two political groups: respondents who identified as moderately liberal, liberal, or extremely liberal, and respondents who identified as centrist, moderately conservative, conservative, or extremely conservative. Centrists were grouped in with the second category since, even without it, the first group already holds the vast majority of the respondents.
 
 ```{r}
+
+# dividing respondents into two groups
 data <- data %>%
   mutate(political_group = case_when(
-    Ideology == "Moderately Liberal" | Ideology == "Liberal" | Ideology == "Extremely Liberal" ~ "Left",
+    Ideology == "Moderately Liberal" | Ideology == "Liberal" | Ideology == "Extremely liberal" ~ "Left",
     TRUE ~ "Not Left"
   ))
 
@@ -258,30 +263,196 @@ gen_engagement_graph <- function(tweetNumber){
       ignore_proportion = mean(Engagement_Ignore.keep.scrolling)
     ) %>%
     gather(key = Engagement, value = Proportion, like_proportion:ignore_proportion) %>%
-    ggplot(aes(Engagement, Proportion, fill = political_group)) + geom_col(position = "dodge") + coord_flip()
+    ggplot(aes(Engagement, Proportion, fill = political_group)) + geom_col(position = "dodge")+ coord_flip() + labs(title = paste(c("Tweet", tweetNumber), collapse = " ")) 
 
   return(toReturn)
 }
 
-gen_engagement_graph(1)
-  
-  
 ```
 
+```{r}
+gen_engagement_graph(1)
 
-THEN DO SAME SHIT FOR SECOND, THEN LAST BIT
+```
 
+Tweet 1, which was made by a democrat running for Congress, expressed desire for policies currently being fought for by the left, including an expansion of public education and governmental healthcare and, most notably, a "Green New Deal". Engagement of all kinds were significantly more common among respondents in the "left" group apart from writing replies. Slightly more than 20% of respondents in both political groups viewed the Tweet's replies, with respondents not identifying with the left viewing replies slightly more frequently. Writing replies was also infrequent for both groups, but was significantly more frequent for non-left respondents.
+
+
+```{r}
+gen_engagement_graph(2)
+
+```
+
+Tweet 2 discussed the controversial, widespread destruction of property that took place after the murder of George Floyd in late May and early June. Likes and both kinds of retweets were more common among left-identifying responses, but non-left respondents viewed replies with almost the same frequency and wrote replies with greater frequency. Nearly twice as many non-left respondents ignored the tweet as left-identifying respondents.
+
+
+```{r}
+gen_engagement_graph(3)
+
+```
+
+Tweet 3 criticized Democratic presidential candidate Joe Biden's refusal to condemn the "Marxist" leaders of the leftist "Black Lives Matter" movement. Given the aggressive nature of the tweet, very few respondents opted to retweet it, and though the only respondents that liked it were non-left, less than 10% of respondents in that group liked it anyway. Many respondents completely ignored the tweet, with more than 50% of left-identifying respondents opting to do so. Interestingly enough, frequencies of private engagement remained relatively high for both groups, with more than 40% of left-identifying respondents viewing the replies, and just over 20% of both groups clicking on the author's profile.
+
+
+```{r}
+gen_engagement_graph(4)
+
+```
+
+Tweet 4 discussed a video in which individuals spray painted messages on the road in front a home with pro-Trump signage in a predominantly liberal neighborhood. All forms of engagement were relatively low, with roughly 60 percent of both groups simply ignoring the tweet, but once again, viewing the replies of the tweet was quite common, with nearly 40% of respondents in both groups indicating that they would do so. This seems to be evidence of a growing trend of individuals stepping across ideological lines to view the replies of Tweets filled with content that they may disagree with, thereby engaging with them. 
+
+```{r}
+gen_engagement_graph(5)
+
+```
+
+Tweet 5 is a skeptical claim that Trump was trying to push a Supreme Court nominee so that in the event that the outcome of the election went to them, the court would be more likely to rule in favor of Trump. Non-left respondents ignored this tweet at an extremely high rate, with almost 80% of them indicating that they would do so. However, nearly 20% of the respondents in this group opted to view the tweet's replies, with just over 30% of left-identifying respondents indicating they would also do the same. 
+
+```{r}
+gen_engagement_graph(6)
+
+```
+
+Tweet 6 describes a video in which, as the author describes, the "Secret Service pushes back liberal thugs at the white house". The tweet author also calls the COVID-19 pandemic a hoax. While just about 60% of the respondents in both groups opted to ignore the tweet, nearly 40% of both groups indicated that they would view the tweet's replies. This is especially interesting, since despite the controversial nature of the tweet, significant portions of both groups choose to engage with the tweet.
+
+```{r}
+gen_engagement_graph(7)
+
+```
+
+Tweet 7 makes a comparison between left-wing and right-wing "extremism", putting the former in a much more positive light. This clear bias may explain why so many of the left-identifying respondents liked the tweet, over 40%. However, once again, both groups viewed replies quite frequently, with non-left respondents at just over 20%, and left-identifying respondents at nearly 30%. Nearly 10% of both groups also chose to click on the author's profile.
+
+```{r}
+gen_engagement_graph(8)
+
+```
+
+Tweet 8 was an exclamation by FLorida Representative Matt Gaetz that Republicans wanted to "OPEN AMERICA UP" rather than lock it down as a response to the pandemic. More than 60% of both groups ignored the tweet, but for those who didn't, non-left respondents liked and retweeted the tweet at a higher rate, but left-identifying respondents indicated they would click on the author's profile, view replies, or write a reply more often than non-left respondents. 
+
+```{r}
+gen_engagement_graph(9)
+
+```
+
+Tweet 9, written by Bernie Sanders, points out the fact that Donald Trump has paid substantially more in tax dollars to other countries than he has in the United States. Unsurprisingly, left-identifying respondents engaged with the content more frequently in almost every category. Another notable feature of the graph is that once again, over 20% of both left-identifying and non-left respondents wanted to view the tweet's replies.
+
+```{r}
+gen_engagement_graph(10)
+
+```
+
+Tweet 10 contained a message defending the "Proud Boys", a white supremacist group, citing the fact that the author hadn't heard of this group doing any kind of "looting, torching, or rioting." Once again, most respondents either ignored the controversial tweet or viewed its replies, but interestingly, this tweet had a higher rate than others of respondents from both groups indicating that they would write a reply. Over 10% of non-left respondents indicated that they would like the tweet, indicating perhaps another potential source that controversial tweets could easily spread: simply by users who agree with the message propagating it to their followers. 
+
+```{r}
+gen_engagement_graph(11)
+
+```
+
+Tweet 11 discusses the recent confirmation of Amy Cohen Barrett to the Supreme Court, saying that the left has no "moral authority to stand on... after what they did to Brett Kavanaugh". Oddly enough, left-identifying respondents indicated they would retweet with a quote more frequently than non-left respondents, but both likes and retweets without a quote were significantly more frequent among non-left respondents than left-identifying respondents. Once again, a significant portion of respondents from both groups indicated that they would view the tweet's replies, with a higher portion of left-identifying respondents indicating that they would do so (nearly 30%!) despite the fact that the tweet promotes a right-wing viewpoint.
+
+```{r}
+gen_engagement_graph(12)
+
+```
+
+In tweet 12, Bernie Sanders points out that Amazon has paid nearly nothing in federal income taxes over the last three years. A significant number of both left-identifying and non-left respondents "liked" the tweet, with 60% of the first category and over 20% of the second category of respondents doing so. Retweet and profile clicks were done at a higher rate for left-identifying respondents, but non-left respondents more frequently indicated that they would view and write replies. This continues a trend of individuals crossing ideological lines to engage with tweets (albeit in just a few, specific ways) more frequently than individuals whose ideological stances align more closely with the message of the tweet.
+
+```{r}
+gen_engagement_graph(13)
+
+```
+
+Tweet 13 attempted to bring attention to the fact that Donald Trump, whom the author called a white supremacist, has been responsible for placing three judges on the Supreme Court. The tweet was ignored by over 80% of non-left respondents, which may explain why left-identifying respondents performed every type of engagement much more frequently than non-left respondents.
+
+```{r}
+gen_engagement_graph(14)
+
+```
+
+Tweet 14 was written by a radio show host advertising his podcast in which he and his co-host "talk the coronavirus hoax, and how masks are merely symbolic, and do nothing to protect you". Despite the significant emotional energy contained in this tweet, over 70% of respondents from both groups ignored the tweet, with the only significant form of engagement being viewing replies, which over 20% of respondents from both categories indicated they would do.
+
+```{r}
+gen_engagement_graph(15)
+
+```
+
+Tweet 15 is a proclamation by Rep. Matt Gaetz that Donald Trump is leading the fight against corruption and against "the establishment". The tweet was ignored often by both left-identifying and non-left respondents (over 80% and 60% respectively), but when it was engaged with, it was engaged with much more frequently than non-left respondents in just about every way. The only significant engagement that left-identifying respondents seem to perform was viewing the tweets replies, which they opted to do just under 12.5% of the time.
+
+```{r}
+gen_engagement_graph(16)
+
+```
+
+Tweet 16 points out the fallacy in claiming that wearing a mask in the midst of a pandemic is tyranny, but that an 8pm curfew in the midst of a protest isn't -- clearly a left-leaning message. This tweet was liked and retweeted relatively frequently by left-identifying respondents (almost 60%  and 20% of the time, respectively), but while the portion of non-left respondents that liked the tweet was around 10%, the portion that desired to retweet was nearly 15%: an interesting discrepancy given that retweeting generally shows more support for a message than does liking a tweet, and given that the tweet's message aligns much more with the left than the right. Another interesting feature of this graph is the proportion of non-left respondents that indicated they wished to view the replies of the tweet, 30%, especially compared to the smaller proportion of left-identifying respondents who indicated wanting to do the same. 
+
+```{r}
+gen_engagement_graph(17)
+
+```
+
+Tweet 17 accuses conservatives of "loving" violence given their defense of their decision to own firearms all while they patronize the left for engaging in non-peaceful protests. Almost 80% of the non-left respondents indicated that they would ignore the tweet, but still a significant number of these resepondents, nearly 20%, indicated that they wished to view the tweet's replies. Non-left respondents were also significantly more likely to write replies than left-identifying respondents, who had higher frequencies of every other kind of engagement.
+
+```{r}
+gen_engagement_graph(18)
+```
+The last tweet of the corpus criticizes the left's claim that Mitch McConnell's attempt to rapidly push in Donald Trump's latest Supreme Court justice is hypocritical, saying that the claim is baseless because doing so is the senate's job. Non-left respondents engaged with the tweet more frequently in every form of engagement apart from one: viewing replies. Both left-identifying and non-left respondents indicated they wanted to view the tweet's replies over 20% of the time, with left-identifying respondents doing so slightly more frequently. 
+
+
+
+The 18 tweets above have proven to give mixed results. Political belief seemed to be a decent predictor of users' choices to like, retweet, or ignore the tweet, where users seemed to do the former two when the tweet's message aligned with their beliefs, and did the latter when it did not. We can verify these patterns by summarizing all 18 of the above tweets into one larger graph, which shows how users of each group, left and not left, engaged with tweets of each kind, left and right:
+
+```{r}
+data %>%
+  mutate(tweet_type = case_when(
+    Tweet %in% c(1, 2, 5, 7, 9, 12, 13, 16, 17) ~ "Left",
+    TRUE ~ "Right"
+  )) %>%
+  mutate(response_type = case_when(
+    tweet_type == "Left" & political_group == "Left" ~ "Left Respondent to Left Tweet",
+    tweet_type == "Left" & political_group == "Not Left" ~ "Non-left Respondent to Left Tweet",
+    tweet_type == "Right" & political_group == "Left" ~ "Left Respondent to Right Tweet",
+    tweet_type == "Right" & political_group == "Not Left" ~ "Non-left Respondent to Right Tweet"
+  )) %>%
+    select(Engagement_Like, Engagement_Retweet.with.quote, Engagement_Retweet.without.quote, Engagement_Click.on.author.s.profile, Engagement_View.replies, Engagement_Write.reply, Engagement_Ignore.keep.scrolling, response_type) %>%
+    group_by(response_type) %>%
+    summarise(
+      like_proportion = mean(Engagement_Like),
+      rt_without_proportion = mean(Engagement_Retweet.without.quote),
+      rt_with_proportion = mean(Engagement_Retweet.with.quote),
+      click_profile_proportion = mean(Engagement_Click.on.author.s.profile),
+      view_replies_proportion = mean(Engagement_View.replies),
+      write_replies_proportion = mean(Engagement_Write.reply),
+      ignore_proportion = mean(Engagement_Ignore.keep.scrolling)
+    ) %>%
+    gather(key = Engagement, value = Proportion, like_proportion:ignore_proportion) %>%
+    ggplot(aes(Engagement, Proportion, fill = response_type)) + geom_col(position = "dodge")+ coord_flip() 
+
+ 
+
+```
+
+As was observed manually through the 18 tweets above, left-identifying respondents were much more likely to like and retweet left-aligned tweets than they were for right-aligned tweets. They also ignored right-aligned tweets far more often than they ignored left-aligned tweets, but they viewed the replies of left-aligned tweets almost exactly as often as they viewed the replies of right-aligned tweets. 
+
+Meanwhile, non-left respondents liked right-aligned tweets almost exactly as frequently as they liked left-aligned tweets. This may be due to the fact that centrists make up a significant portion of the non-left population, but even then, the fact that the conservative portion of the non-left respondents didn't create any sort of separation between the two categories of tweets is intriguing to say the last. There also wasn't much separation between the frequencies at which non-left respondents ignored left-aligned and right-aligned tweets, and the same seems to hold true for retweets and ignoring tweets. As was the case with the left-identifying respondents, though, non-left respondents marked "view replies" at about the same frequency for both categories of tweets. 
+
+THEN ANSWER BIG POINT
+The following 
+
+
+THEN LAST BIT
 
 
 
 THINGS THAT I WANT TO TEST:
 - Compare political ideology to engagement for each tweet
-- Compare political ideology to emotional response for each tweet
 - Emotional response vs engagement, compare between political parties
 
 
 ## Analysis of Results
-
+- Engagement with controversial tweets - cite example of tweet 6 - viewing replies = more engagement, which likely results in more time spent on the app = algorithm more likely to recommend similar tweets to those users - same with 14 (hoax radio hosts)
+- Tweet 8 - Gaetz - leftists being more likely to view replies (as with tweet 11 about Kavanaugh), write reply, click on profile
+- Trends - non-left respondents seemed more likely to homogenously/monolithically/uniformly ignore tweets in large numbers
+- HUGE TREND - political messaging of the tweet didn't really seem to sway the engagement of non-left respondents. Centrists? Perhaps right-aligned tweets were to extreme for the mostly moderately conservative students?
 
 ## Conclusion
 
