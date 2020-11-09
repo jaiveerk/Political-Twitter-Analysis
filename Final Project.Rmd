@@ -8,6 +8,8 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
+library(knitr)
+library(broom)
 ```
 ## Introduction
 
@@ -234,7 +236,7 @@ The last pair of emotions provided to respondents were dissension and agreement.
 
 In addition to the aforementioned emotional responses, respondents also had the option to mark "NONE", indicating that they had no significant emotional response. Half of the tweets had between 20 and 40% of the respondents mark this as their response, while the rest of the tweets were just outside this range. This was especially interesting given one of the assumptions reached in the background of this paper, which stated that it would make sense for political content generators to produce intentionally emotionally-charged content since emotionally-charged content will generally spread more and draw more participation than purely reason-based content. However, it is possible that the content was emotionally charged, and, as was said before, respondents had simply been overexposed to political content prior to taking the survey. As a result, respondents may have been much more likely to feel apathetic to the content in the survey than if they hadn't taken the survey in the weeks leading up to a presidential election, therefore causing the high rates of apathy for the tweets in the survey.
 
-### Relationships Between Political Stance, Emotional Reaction, and Engagement
+### The Influence of Political Beliefs on Engagement
 Before diving directly into the relationship between individuals' emotional response to political content and their engagement with it, it may be valuable to first understand how their political beliefs affect their engagement. After all, it only makes sense that one's emotional disposition regarding political tweets would be heavily influenced by their political beliefs. Therefore, any relationship between people's ideological stances and their engagement may provide context necessary to this study's attempt at answering the focal question.
 
 The following graphs show, for each tweet, how engagement varied across two political groups: respondents who identified as moderately liberal, liberal, or extremely liberal, and respondents who identified as centrist, moderately conservative, conservative, or extremely conservative. Centrists were grouped in with the second category since, even without it, the first group already holds the vast majority of the respondents.
@@ -397,8 +399,6 @@ gen_engagement_graph(18)
 ```
 The last tweet of the corpus criticizes the left's claim that Mitch McConnell's attempt to rapidly push in Donald Trump's latest Supreme Court justice is hypocritical, saying that the claim is baseless because doing so is the senate's job. Non-left respondents engaged with the tweet more frequently in every form of engagement apart from one: viewing replies. Both left-identifying and non-left respondents indicated they wanted to view the tweet's replies over 20% of the time, with left-identifying respondents doing so slightly more frequently. 
 
-
-
 The 18 tweets above have proven to give mixed results. Political belief seemed to be a decent predictor of users' choices to like, retweet, or ignore the tweet, where users seemed to do the former two when the tweet's message aligned with their beliefs, and did the latter when it did not. We can verify these patterns by summarizing all 18 of the above tweets into one larger graph, which shows how users of each group, left and not left, engaged with tweets of each kind, left and right:
 
 ```{r}
@@ -433,28 +433,162 @@ data %>%
 
 As was observed manually through the 18 tweets above, left-identifying respondents were much more likely to like and retweet left-aligned tweets than they were for right-aligned tweets. They also ignored right-aligned tweets far more often than they ignored left-aligned tweets, but they viewed the replies of left-aligned tweets almost exactly as often as they viewed the replies of right-aligned tweets. 
 
-Meanwhile, non-left respondents liked right-aligned tweets almost exactly as frequently as they liked left-aligned tweets. This may be due to the fact that centrists make up a significant portion of the non-left population, but even then, the fact that the conservative portion of the non-left respondents didn't create any sort of separation between the two categories of tweets is intriguing to say the last. There also wasn't much separation between the frequencies at which non-left respondents ignored left-aligned and right-aligned tweets, and the same seems to hold true for retweets and ignoring tweets. As was the case with the left-identifying respondents, though, non-left respondents marked "view replies" at about the same frequency for both categories of tweets. 
+Meanwhile, non-left respondents liked right-aligned tweets almost exactly as frequently as they liked left-aligned tweets. This may be due to the fact that centrists make up a significant portion of the non-left population, but even then, the fact that the conservative portion of the non-left respondents didn't create any sort of separation between the two categories of tweets is intriguing to say the last. This is made even more surprising upon observing that a similar trend holds for other kinds of engagement, including profile clicks, likes, retweets, and writing replies. 
 
-THEN ANSWER BIG POINT
-The following 
+There also wasn't much separation between the frequencies at which non-left respondents ignored left-aligned and right-aligned tweets, and the same seems to hold true for retweets and ignoring tweets. As was the case with the left-identifying respondents, though, non-left respondents marked "view replies" at about the same frequency for both categories of tweets. 
+
+### The Influence of Emotional Response on Engagement
+Now that some relationship between political ideology and engagement has been observed, adequate context has been established to analyze the relationship between emotion and engagement. This process can begin by first looking at how different emotional states contributed to a user's likelihood of performing each kind of engagement. This can be ascertained through a logistic regression model that predicts whether or not a user performed a certain kind of engagement based on their emotional response to the tweet. Only coefficients with a p-value under 0.05 will be discussed, as they are the only statistically-significant relationships that can be observed using the standard alpha value of 0.05.
+
+```{r}
+logreg_data <- data %>%
+  mutate(Engagement_Like = as.factor(Engagement_Like)) %>%
+  mutate(Engagement_Retweet.with.quote = as.factor(Engagement_Retweet.with.quote)) %>%
+  mutate(Engagement_Retweet.without.quote = as.factor(Engagement_Retweet.without.quote)) %>%
+  mutate(Engagement_Click.on.author.s.profile = as.factor(Engagement_Click.on.author.s.profile)) %>%
+  mutate(Engagement_View.replies = as.factor(Engagement_View.replies)) %>%
+  mutate(Engagement_Write.reply = as.factor(Engagement_Write.reply)) %>%
+  mutate(Reaction_Fear = as.factor(Reaction_Fear)) %>%
+  mutate(Reaction_Hope = as.factor(Reaction_Hope)) %>%
+  mutate(Reaction_Sadness = as.factor(Reaction_Sadness)) %>%
+  mutate(Reaction_Joy = as.factor(Reaction_Joy)) %>%
+  mutate(Reaction_Distress = as.factor(Reaction_Distress)) %>%
+  mutate(Reaction_Relief = as.factor(Reaction_Relief)) %>%
+  mutate(Reaction_Frustration = as.factor(Reaction_Frustration)) %>%
+  mutate(Reaction_Empathy = as.factor(Reaction_Empathy)) %>%
+  mutate(Reaction_Dissension = as.factor(Reaction_Dissension)) %>%
+  mutate(Reaction_Agreement = as.factor(Reaction_Agreement)) 
+
+```
+
+```{r}
+like_model <- glm(Engagement_Like ~ Reaction_Fear + Reaction_Hope + Reaction_Sadness + Reaction_Joy + Reaction_Distress + Reaction_Relief + Reaction_Frustration + Reaction_Empathy + Reaction_Dissension + Reaction_Agreement, data = logreg_data,  family = binomial)
+
+kable(tidy(like_model, exponentiate = FALSE, conf.int = TRUE), format = "markdown", digits = 3)
+```
+
+The first engagement that users had the option to select was to like the tweet. The above model shows that, in accordance with the hypothesis, there were multiple negative emotions that made users more likely to like the tweet. For instance, it shows that, holding all else constant, if a user experienced fear from a tweet, the odds of them liking the tweet were `r exp(0.608)` times higher than if they hadn't experienced fear. Moreover, holding all else constant, feeling sadness and frustration increased the odds that a respondent would like a tweet by factors of `r exp(0.584)` and `r exp(0.411)` respectively. The remaining statistically significant emotional responses were hope, dissension, and agreement, which had coefficients of 1.697,  -2.705, and 2.879 respectively. All three of these had a dramatic effect on the odds that a respondent would like a tweet, where, with all else held constant, each would change the odds by factors of `r exp(1.697)`,  `r exp(-2.705)`, and `r exp(2.879)` in the same order.
+
+```{r}
+rt_with_model <- glm(Engagement_Retweet.with.quote ~ Reaction_Fear + Reaction_Hope + Reaction_Sadness + Reaction_Joy + Reaction_Distress + Reaction_Relief + Reaction_Frustration + Reaction_Empathy + Reaction_Dissension + Reaction_Agreement, data = logreg_data,  family = binomial)
+
+kable(tidy(rt_with_model, exponentiate = FALSE, conf.int = TRUE), format = "markdown", digits = 3)
+```
+
+The only statistically significant predictors of the log-odds that a respondent would retweet a tweet with a quote were frustration and agreement, both of which increased the odds that a respondent would do so by factors of `r exp(0.955)` and `r exp(1.731)` with all else held equal for each.
+
+```{r}
+rt_without_model <- glm(Engagement_Retweet.without.quote ~ Reaction_Fear + Reaction_Hope + Reaction_Sadness + Reaction_Joy + Reaction_Distress + Reaction_Relief + Reaction_Frustration + Reaction_Empathy + Reaction_Dissension + Reaction_Agreement, data = logreg_data,  family = binomial)
+
+kable(tidy(rt_without_model, exponentiate = FALSE, conf.int = TRUE), format = "markdown", digits = 3)
+```
+
+There were a few more statistically significant emotional responses for retweets without quotes than for retweets with quotes. Both fear and hope seemed to increase the odds that a respondent would retweet a tweet without a quote by factors of `r exp(0.926)` and `r exp(0.984)` respectively, with all else held equal for each. Experiencing joy also increased the odds that a respondent would retweet a tweet by a factor of `r exp(0.865)` with all else held equal. A similar effect was observed when respondents experienced frustration, emapthy, and agreement, as all increased the odds that a respondent would retweet a tweet without a quote by factors of `r exp(0.521)`, `r exp(0.607)`, and `r exp(2.109)` holding all else equal. Dissension was the lone emotional response to decrease the odds of retweeting without a quote, doing so by a factor of `r exp(-2.064)` with everything else held constant. 
+
+```{r}
+click_model <- glm(Engagement_Click.on.author.s.profile ~ Reaction_Fear + Reaction_Hope + Reaction_Sadness + Reaction_Joy + Reaction_Distress + Reaction_Relief + Reaction_Frustration + Reaction_Empathy + Reaction_Dissension + Reaction_Agreement, data = logreg_data,  family = binomial)
+
+kable(tidy(click_model, exponentiate = FALSE, conf.int = TRUE), format = "markdown", digits = 3)
+```
+
+Fear, hope, and agreement were the only emotional responses that had a statistically significant effect on respondents' odds of clicking on the profile of a tweet's author. They all increased the odds of doing so by factors of `r exp(0.648)`, `r exp(0.896)`, and `r exp(0.3)` respectively, with all else held equal.
+
+```{r}
+view_replies_model <- glm(Engagement_View.replies ~ Reaction_Fear + Reaction_Hope + Reaction_Sadness + Reaction_Joy + Reaction_Distress + Reaction_Relief + Reaction_Frustration + Reaction_Empathy + Reaction_Dissension + Reaction_Agreement, data = logreg_data,  family = binomial)
+
+kable(tidy(view_replies_model, exponentiate = FALSE, conf.int = TRUE), format = "markdown", digits = 3)
+```
+
+A wide range of emotions affected respondents' odds of viewing the replies of a tweet. Fear, hope, frustration, empathy, and agreement were the five that had statistically significant relationships with respondents' decision to view a tweet's replies, as each increased the odds of respondents doing so by respective factors of `r exp(0.633)`, `r exp(0.653)`, `r exp(0.375)`, `r exp(0.519)`, and `r exp(0.287)`, with all else held equal.
+
+```{r}
+write_reply_model <- glm(Engagement_Write.reply ~ Reaction_Fear + Reaction_Hope + Reaction_Sadness + Reaction_Joy + Reaction_Distress + Reaction_Relief + Reaction_Frustration + Reaction_Empathy + Reaction_Dissension + Reaction_Agreement, data = logreg_data,  family = binomial)
+
+kable(tidy(write_reply_model, exponentiate = FALSE, conf.int = TRUE), format = "markdown", digits = 3)
+```
+
+The last form of engagement that users had the option to perform was writing replies, which seems to be most significantly related to emotional responses of hope, distress, frustration, dissension, and agreement. The first four all increased the odds that respondents would choose to write replies, with each increasing the odds of doing so by factors of `r exp(1.428)`, `r exp(1.164)`, `r exp(0.839)`, `r exp(1.068)` respectively with all else held equal for each. The only emotional response that significantly decreased the odds that a participant would write a reply was agreement, which decreased the odds of writing a reply by a factor of `r exp(-1.202)`.
+
+The last option that participants had on the survey wasn't an engagement, but rather, a lack thereof: to ignore the Tweet, and "keep scrolling" through their Twitter feed. Understanding the emotional responses that caused respondents to select this option can provide valuable information, though. To look at which emotional responses prompted engagement in general, one can look at the emotional responses that decreased the odds that a respondent would ignore a tweet.
+
+```{r}
+ignore_model <- glm(Engagement_Ignore.keep.scrolling ~ Reaction_Fear + Reaction_Hope + Reaction_Sadness + Reaction_Joy + Reaction_Distress + Reaction_Relief + Reaction_Frustration + Reaction_Empathy + Reaction_Dissension + Reaction_Agreement, data = logreg_data,  family = binomial)
+
+kable(tidy(ignore_model, exponentiate = FALSE, conf.int = TRUE), format = "markdown", digits = 3)
+```
+
+The statistically significant emotional responses with negative coefficients in this model were fear, hope, frustration, and agreement. In other words, with all else held constant, each of these emotions decreased the odds that a respondent would ignore a tweet by factors of `r exp(-0.445)`, `r exp(-1.591)`, `r exp(-0.545)`, and `r exp(-1.898)` respectively.
+
+These findings can be verified by seeing which emotional responses were the best predictors of total engagement, found by adding up all the forms of engagement that users indicated they would perform for each given tweet. Given that this total engagement value would no longer be binary, a linear regression model would be more appropriate:
+
+```{r}
+linreg_data <- data %>%
+  mutate(total_engagement = Engagement_Like + Engagement_Retweet.with.quote + Engagement_Retweet.without.quote + Engagement_Click.on.author.s.profile + Engagement_View.replies + Engagement_Write.reply) %>%
+  mutate(Reaction_Fear = as.factor(Reaction_Fear)) %>%
+  mutate(Reaction_Hope = as.factor(Reaction_Hope)) %>%
+  mutate(Reaction_Sadness = as.factor(Reaction_Sadness)) %>%
+  mutate(Reaction_Joy = as.factor(Reaction_Joy)) %>%
+  mutate(Reaction_Distress = as.factor(Reaction_Distress)) %>%
+  mutate(Reaction_Relief = as.factor(Reaction_Relief)) %>%
+  mutate(Reaction_Frustration = as.factor(Reaction_Frustration)) %>%
+  mutate(Reaction_Empathy = as.factor(Reaction_Empathy)) %>%
+  mutate(Reaction_Dissension = as.factor(Reaction_Dissension)) %>%
+  mutate(Reaction_Agreement = as.factor(Reaction_Agreement)) 
+
+total_model <- lm(total_engagement ~ Reaction_Fear + Reaction_Hope + Reaction_Sadness + Reaction_Joy + Reaction_Distress + Reaction_Relief + Reaction_Frustration + Reaction_Empathy + Reaction_Dissension + Reaction_Agreement, data = linreg_data) 
+
+tidy(total_model, conf.int = TRUE, level = 0.95) %>%
+  kable(digits = 3)
+
+```
+
+Not only were fear, hope, frustration, and agreement statistically significant predictors of total engagement (this time with coefficients of 0.32, 0.659, 0.199, and 0.779), but the linear model also shows that joy and empathy also had significant positive correlations with total engagement numbers (with coefficients of 0.307 and 0.308 respectively). These coefficients can be interpreted as follows. According to the model, on average, one can expect a user's total number of engagements with a tweet to increase by the value of the coefficient if they were to feel that emotion, holding all else equal. 
 
 
-THEN LAST BIT
+
+### Additional Discussion of Results
+Given the significant number of results that have been extracted from the survey, there is much to unpack, analyze, and extrapolate from. To begin, it is important to reintroduce the hypothesis of this study: that tweets that cause negative emotional responses in their audience will field more engagement than tweets that do not. 
+
+This hypothesis can first be understood from the angle of individuals' political beliefs. As was demonstrated in the first part of the main results section, there exists a complex relationship between individuals' political beliefs and the way in which they interact with content that both aligns with and goes against their views. It is not the case that individuals will always engage more with tweets that align with their views, nor is it the case that they will always engage more with tweets that go against them. For example, as can be observed from the data above, while there was a clear trend for forms of engagement like retweets and likes among left-identifying respondents, there was no such trend for viewing replies or ignoring tweets.
+
+As is the case with any study, it is very possible that trends may have been either exaggerated or obfuscated simply due to the methods of data collection. In the case of this study, this concept is apparent in how different tweets of the same political alignment exhibited different patterns of engagement across the two groups of respondents, thereby obfuscating any trend that may have otherwise appeared in the data. For instance, tweet 8, in which Florida Rep Matt Gaetz calls for America to be opened back up, doesn't exhibit any clear pattern between political alignment and how users engaged with the tweet. While non-left respondents were more likely to retweet and like the tweet, left-identifying respondents were noticeably more likely to view replies and click on the author's profile. This deviates from the general trend that was observed across all 18 tweets (that non-left respondents were just as likely to view the replies of right-aligned tweets and click on the profiles of the authors who wrote them). It is difficult to know whether the patterns observed in this tweet are representative of reality or if they're simply anomalies, and since the general conclusions drawn from this study are drawn, in part, using this tweet, it's impossible to know whether those general conclusions are nearer to or further from reality because of it.
+
+The point of this study was to choose intentionally controversial, polarizing tweets, but it's difficult to make generalizations about "polarizing tweets" when these tweets cover subject matter of varying levels of controversy (which is difficult to quantify to begin with). Therefore, it becomes difficult to make generalizations about the way in which users interact with these controversial tweets, and to then tie that to their political stance. Tweet 6, for example, showed scenes of aggression and conflict between protesters and law enforcement officials shortly after the murder of George Floyd. While it was a tweet whose message was more aligned with that of the political right in the United States, the super controversial nature of the tweet, along with its brash language, may have caused individuals to act differently from how they may have acted towards other controversial tweets. While the data for this tweet did support some trends observed in other tweets, as it was liked significantly more by non-left respondents and ignored more by left-identifying respondents, the data contradicted other trends, like how left-identifying respondents retweeted the tweet with a quote at a higher frequency than non-left respondents. 
+
+Nearly 40% of both groups indicated that they would want to view the replies of the tweet, likely due to the tweet's super controversial nature, which is no insignificant piece of information. First, it continues the trend of respondents in both political groups responding to tweets at roughly the same frequency. Second, and perhaps more importantly, it shows that users are still interacting with these tweets to a pretty significant extent. As was mentioned in the beginning of this document, the purpose of this study was to understand, to some extent, why social media platforms like Twitter seem to select for and propagate outrage-inducing content. As was also mentioned, it seems intuitive that a content-recommendation algorithm would attempt to find content that keeps users on the apps more. If such controversial tweets are drawing engagement from users and prompting them to spend more time on the application by viewing the tweet's replies, which again, almost 40% of respondents from both groups indicated they would do, then it makes sense that any recommender using the aforementioned criteria would prioritize similarly controversial, outrage-inducing content.
+
+The same phenomenon can be observed with Tweet 14, which called the COVID-19 pandemic a hoax and made the claim that masks were "merely symbolic". Similar patterns hold, where non-left respondents were more likely to like the tweet, left-identifying respondents were more likely to retweet with a quote, and over 70% of both groups opted to ignore the tweet entirely, but over 20% of both sets of respondents indicated that they would view the replies. Again, it shows how tweets of varying controversy can draw varying patterns of engagement, so any generalized patterns observed or conclusions drawn from the data above may have been skewed due to varying levels of controversy among the tweets in the survey. It also shows how extremely controversial tweets can incite users to spend more time on the application by viewing the tweet's replies, likely influencing individuals' recommender systems to continue to prioritize such outrage-inducing, polarizing content.
+
+Given these variations that exist between the tweets, it may be difficult to make any factual statement about the relationship between users' emotional responses to political tweets and the way in which they engage with them, and therefore, it may be difficult to verify the hypothesis of this study. However, an attempt will be made to do so based on the data that was collected.
+
+The data collected show that negative emotions increased the odds that respondents would perform just about every kind of engagement. Fear, for instance, significantly increased the odds that a respondent would like a tweet, retweet it without a quote, click the profile of an author, and view a tweet's replies. While sadness only significantly increased the odds that a user would like a tweet, frustration significantly increased the odds that a user would like a tweet, retweet it with or without a quote, and view and write replies to tweets. Distress and dissension only significantly increased the odds that a user would write a reply to a tweet. It is also worth noting that fear and frustration were both statistically significant in the last model as well, which was made to predict the number of types of engagement that users would perform on a given tweet based on their emotional response to it. This may be interpreted to mean that both effected multiple types of engagement from the respondents on a very frequent basis.
+
+The findings above clearly uphold the hypothesis. Every negative emotion apart from dissension significantly increased, and never decreased, the odds that a respondent would perform at least one type of engagement on a tweet, showing that tweets that caused negative emotions were more likely to attract more engagement from users than tweets that did not. 
+
+As has been mentioned, the role of dissension, and therefore of one's political beliefs, is much more complex, and does not justify nor contradict the hypothesis directly. On one hand, left-identifying respondents were much more likely to ignore right-aligned tweets than left aligned tweets, implying that they were less likely to engage with tweets that they disagreed with, which contradicts the hypothesis. Left-identifying respondents were also significantly more likely to like and retweet tweets that aligned with the left, which also contradicts the hypothesis, but they were about equally likely to view the replies of tweets and click on the profiles of authors of tweets aligning with either side, which neither disproves nor justifies the hypothesis.
+
+Different patterns were observed for non-left respondents, who were nearly equally likely to ignore tweets regardless of their alignment, which neither justifies nor disproves the hypothesis. They were slightly more likely to view the replies of and click on the profiles of authors of right-aligned tweets, but both differences were negligible and don't strongly justify the hypothesis. 
+
+Something about agreement/disagreement not always resulting in negative emotions
 
 
+// say something about positive - and how that doesn't concern the focus of this study/hypothesis
 
-THINGS THAT I WANT TO TEST:
-- Compare political ideology to engagement for each tweet
-- Emotional response vs engagement, compare between political parties
+Likes model - negative emotions made users significantly more likely to like the tweet (fear, sadness, frustration) - dissension decreased likelihood
+
+Retweets with quote - frustration, agreement. Without  hope fear joy frustration empathy increased, dissension decreased
+
+Click - fear hope and agreement all increased
+
+View replies - Fear, hope, frustration, empathy, and agreement all increased
+
+Write replies - hope, distress, frustration, dissension, increased,  agreement decreased
+
+Big model and ignoring - fear, hope, frustration were anti-ignore, while total engagement also affected by 
 
 
-## Analysis of Results
-- Engagement with controversial tweets - cite example of tweet 6 - viewing replies = more engagement, which likely results in more time spent on the app = algorithm more likely to recommend similar tweets to those users - same with 14 (hoax radio hosts)
-- Tweet 8 - Gaetz - leftists being more likely to view replies (as with tweet 11 about Kavanaugh), write reply, click on profile
-- Trends - non-left respondents seemed more likely to homogenously/monolithically/uniformly ignore tweets in large numbers
-- HUGE TREND - political messaging of the tweet didn't really seem to sway the engagement of non-left respondents. Centrists? Perhaps right-aligned tweets were to extreme for the mostly moderately conservative students?
 
 ## Conclusion
-
+ALMOST HERE
 
 
