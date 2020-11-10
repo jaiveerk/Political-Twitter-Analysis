@@ -19,10 +19,39 @@ library(broom)
 
 
 ## Procedure
- Explain ordering of questions
- Explain tweet selection process
- Explain coming up with engagement options, why they matter
- Explain emotional scale
+To test the research question, a Google Form that simulated Twitter was shared among college students all over the country. The form contained three parts. The first presented screenshots of 18 political tweets on controversial subject matter, including the coronavirus pandemic, Donald Trump’s nomination of Amy Cohen Barrett to the Supreme Court, and racial justice protests that took place in the summer of 2020. The tweets were selected to be controversial to simulate the divisive, polarizing nature of content that dominates political Twitter today, and they were found both by using Twitter’s search functionality (to find tweets containing specific words or phrases that were published within a specific timeframe) and by going through popular political Twitter accounts. Users were asked how they would engage with each tweet if they were to see it on their Twitter feed, and for each tweet they were given the option to “Like”, “Retweet with quote”, “Retweet without quote”, “Click on author’s profile”, “View replies”, and “Write reply”. Users could select any number of options, but if they did not wish to engage with the tweet in any way, they also had the option to “Ignore/keep scrolling”. This way, the questions could be made mandatory so that users had to answer, but users weren’t required to engage with each tweet. Each question in this first section ended up taking a similar form to the question pictured below:
+![section one example](section1.png)
+
+In the next part of the form, users were presented the same tweets in the same random order, but this time, were asked to provide an emotional response to each tweet. The options provided were fear, hope, sadness, joy, distress, relief, frustration, empathy, dissension, and agreement, which were based on Ira Roseman’s model described in his article “Appraisal Determinants of Emotions: Constructing a More Accurate and Comprehensive Theory” published in 1996. Again, all questions on the survey were made mandatory, so if users had none of these emotional responses, they also indicate apathy with an option marked “NONE”. Respondents were asked about their emotional response after they were asked about their engagement since they may have acted differently towards each tweet if they were consciously aware of their emotional reaction to it. Questions in this section took the following form:
+![section two example](section2.png)
+
+At the very end of the survey, users were asked about their political beliefs, and were asked to self identify as either “Extremely liberal”, “Liberal”, “Moderately liberal”, “Centrist”, “Moderately conservative”, “Conservative”, or “Extremely conservative”. Users were told multiple times throughout the survey that their responses would be completely anonymized, and that any information they provided would not be used to identify them, nor would their responses be associated with any component of their individual identity. This was emphasized strongly so that respondents didn’t feel hesitant to engage with the content however they would have if they were on Twitter.
+
+To attract as many participants as possible, the survey was spread throughout various social media groups primarily made up of college students, and individuals were incentivized to take the study by being offered a chance to enter a raffle for one of three gift cards.
+
+Responses were written to a CSV which underwent additional formatting done by [this python script](https://github.com/jaiveerk/political-twitter-analysis/blob/master/preprocessor.py). In addition to anonymizing the responses, the script also formatted responses from the first two sections into binary variables.
+
+## Tweets Used
+The following screenshots were used in the survey in order:
+
+![tweet](tweet1.png)
+![tweet](tweet2.png)
+![tweet](tweet3.png)
+![tweet](tweet4.png)
+![tweet](tweet5.png)
+![tweet](tweet6.png)
+![tweet](tweet7.png)
+![tweet](tweet8.png)
+![tweet](tweet9.png)
+![tweet](tweet10.png)
+![tweet](tweet11.png)
+![tweet](tweet12.png)
+![tweet](tweet13.png)
+![tweet](tweet14.png)
+![tweet](tweet15.png)
+![tweet](tweet16.png)
+![tweet](tweet17.png)
+![tweet](tweet18.png)
 
 ## Results
 
@@ -41,7 +70,7 @@ num_uni
   
 ```
 
-Through the data collection methods above, responses were collected from 204 students attending 48 different universities. These were both public and private universities scattered throughout the country from the University of Florida to Stanford University. 
+Through the data collection methods above, responses were collected from 203 students attending 48 different universities. These were both public and private universities scattered throughout the country from the University of Florida to Stanford University. 
 
 This variety of colleges likely had an impact on the next statistic observed - the respondents' political stances. 
 
@@ -569,26 +598,38 @@ As has been mentioned, the role of dissension, and therefore of one's political 
 
 Different patterns were observed for non-left respondents, who were nearly equally likely to ignore tweets regardless of their alignment, which neither justifies nor disproves the hypothesis. They were slightly more likely to view the replies of and click on the profiles of authors of right-aligned tweets, but both differences were negligible and don't strongly justify the hypothesis. 
 
-Something about agreement/disagreement not always resulting in negative emotions
-
-
-// say something about positive - and how that doesn't concern the focus of this study/hypothesis
-
-Likes model - negative emotions made users significantly more likely to like the tweet (fear, sadness, frustration) - dissension decreased likelihood
-
-Retweets with quote - frustration, agreement. Without  hope fear joy frustration empathy increased, dissension decreased
-
-Click - fear hope and agreement all increased
-
-View replies - Fear, hope, frustration, empathy, and agreement all increased
-
-Write replies - hope, distress, frustration, dissension, increased,  agreement decreased
-
-Big model and ignoring - fear, hope, frustration were anti-ignore, while total engagement also affected by 
-
 
 
 ## Conclusion
-ALMOST HERE
+METHODS FOR IMPROVEMENT? IDK SEE NOTES
 
+The observed differences between the effect of political stance on engagement and the effect of negative emotion on engagement point to a variety of things. One of the more obvious interpretations, though, is that political disagreement may not necessarily connote negative emotions. Rather, they may be two separate phenomena. This concept may point to a broader idea that if disagreement does not have to connote negative emotions, perhaps it is possible to engage in online discourse where individuals' ideas and perceptions are challenged without the accompaniment of sour feelings. Of course, this sounds easier in theory than it is to perform in practice. A 2018 study by Christopher Bail showed that being exposed to virtual content on the other side of the aisle only drove those who identified as Republican to be even more conservative, while those who identified as Democrats were driven slightly left, though the second effect did not seem to be statistically significant (Bail, "Exposure"). This issue is relevant because it’s clear that the content that we’re presented with can have a significant sway on our emotions and political views, and thus, can contribute to or detract from the divisive, hostile political climate that exists online. Therefore, it’s as important as ever to understand the processes that make this issue worse than it already is. Understanding why we engage with the content that we do on social media, though, is a step in that direction.
+
+
+There is some hope...? 
+
+SEE NOTES
+
+## Bibliography
+Bail, Christopher A., et al. “Channeling Hearts and Minds: Advocacy Organizations, Cognitive-Emotional Currents, and Public Conversation.” American Sociological Review, vol. 82, no. 6, Dec. 2017, pp. 1188–1213, doi:10.1177/0003122417733673.
+
+Bail CA. Emotional Feedback and the Viral Spread of Social Media Messages About Autism Spectrum Disorders. Am J Public Health. 2016 Jul;106(7):1173-80. doi: 10.2105/AJPH.2016.303181. Epub 2016 May 19. PMID: 27196641; PMCID: PMC4984751.
+
+Bail, Christopher A., et al. "Exposure to opposing views on social media can increase political polarization." Proceedings of the National Academy of Sciences 115.37 (2018): 9216-9221.
+
+Marcus, George E. “Emotions and Politics: Hot Cognitions and the Rediscovery of Passion.” Social Science Information, vol. 30, no. 2, June 1991, pp. 195–232, doi:10.1177/053901891030002001.
+
+Marx, P. Anti‐elite politics and emotional reactions to socio‐economic problems: Experimental evidence on “pocketbook anger” from France, Germany, and the United States. Br J Sociol. 2020; 71: 608– 624. https://doi-org.proxy.lib.duke.edu/10.1111/1468-4446.12750
+
+Pavlova A, Berkers P. Mental health discourse and social media: Which mechanisms of cultural power drive discourse on Twitter. Soc Sci Med. 2020 Oct;263:113250. doi: 10.1016/j.socscimed.2020.113250. Epub 2020 Aug 6. PMID: 32862081.
+
+Roseman, Ira J. "Appraisal determinants of emotions: Constructing a more accurate and comprehensive theory." Cognition & Emotion 10.3 (1996): 241-278.
+
+Tufekci, Zeynep "We're building a dystopia just to make people click on ads." TED: Ideas Worth Spreading, October 2017, https://www.ted.com/talks/zeynep_tufekci_we_re_building_a_dystopia_just_to_make_people_click_on_ads?language=en  
+
+The Social Dilemma. Directed by Jeff Orlowski, performance by Tristan Harris, Exposure Labs, 2020. Netflix. https://www.netflix.com/title/81254224.
+
+---
+
+Anonymized response data can be found [here](https://github.com/jaiveerk/political-twitter-analysis)
 
